@@ -6,19 +6,16 @@ from langgraph.graph import StateGraph, END
 
 import tools
 
-# --- Setup ---
 load_dotenv()
 if not os.getenv("OPENAI_API_KEY"):
     raise ValueError("OPENAI_API_KEY not found. Please add it to .env")
 
-# --- State Definition ---
 class AgentState(TypedDict):
     goal: str
     past_steps: List[str]
     action_command: str
     result: str
 
-# --- Executor Node ---
 def executor_node(state: AgentState) -> dict:
     print("\n--- EXECUTOR ---")
     past_steps = "\n".join(state["past_steps"])
@@ -59,17 +56,14 @@ def tool_node(state: AgentState) -> dict:
         "result": result
     }
 
-# Conditional Edge
 def should_continue(state: AgentState) -> str:
     if state["action_command"].startswith("FINISH"):
         return "end"
     return "continue"
 
-# Graph Definition 
 workflow = StateGraph(AgentState)
 workflow.add_node("executor", executor_node)
 workflow.add_node("tools", tool_node)
-
 workflow.set_entry_point("executor")
 workflow.add_edge("executor", "tools")
 workflow.add_conditional_edges("tools", should_continue, {"continue": "executor", "end": END})
@@ -79,7 +73,6 @@ app = workflow.compile()
 if __name__ == "__main__":
     GOAL = "Fetch TSLA, calculate SMA, then backtest SMA strategy"
     inputs = {"goal": GOAL, "past_steps": [], "result": ""}
-    
     for event in app.stream(inputs):
         for k, v in event.items():
             if k != "__end__":
