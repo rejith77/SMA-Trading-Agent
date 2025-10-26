@@ -1,5 +1,5 @@
 
-## Financial Trading Agent (LangGraph + OpenAI)
+## Stateful AI Trading Agent with LangGraph
 
 An autonomous financial trading agent powered by LangGraph, LangChain, and OpenAI, capable of executing financial analysis tasks such as fetching stock data, calculating indicators (like SMA/RSI), and running strategy backtests automatically through iterative reasoning.
 
